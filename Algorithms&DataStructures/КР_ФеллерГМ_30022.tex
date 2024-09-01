@@ -1,0 +1,760 @@
+\documentclass[a4paper,14pt]{article}
+
+% Поддержка русского языка
+\usepackage[T1, T2A]{fontenc}    % Кодировка
+\usepackage[utf8]{inputenc}  % Кодировка исходного текста
+\usepackage[english, russian]{babel}  % Локализация и переносы
+\usepackage{titlesec, titletoc} % Для настройки стилей заголовков и содержания
+\usepackage{booktabs} % Для использования \toprule, \midrule и \bottomrule
+\usepackage{array}  % Для лучшего контроля столбцов
+\usepackage{cmap}    % Поиск и копирование в PDF
+\usepackage{geometry}    % Поля
+    \geometry{left=30mm, right=15mm, top=20mm, bottom=20mm}
+\usepackage{hhline} % Для двойных линий и более точного контроля границ
+\usepackage{caption} % Для настройки подписей
+\usepackage{verbatim}
+\usepackage{xcolor} % Пакет для цвета
+\usepackage{listings} % Пакет для вставки кода
+\usepackage{indentfirst}
+
+% \usepackage{times}
+
+% Установка стандартного отступа (2em)
+\setlength{\parindent}{2em}
+
+% Установка отступа после заголовков
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{2\baselineskip}{\baselineskip}
+\titlespacing*{\subsection}{0pt}{2\baselineskip}{\baselineskip}
+\titlespacing*{\subsubsection}{0pt}{2\baselineskip}{\baselineskip}
+
+% Определение цветов
+% \definecolor{operatorcolor}{HTML}{ED028C}
+% \definecolor{stringcolor}{HTML}{9400D1}
+% \definecolor{commentcolor}{HTML}{005000}
+% \definecolor{backgroundcolor}{HTML}{fafafa}
+\definecolor{backgroundcolor}{HTML}{fafafa} % Темный фон
+\definecolor{keywordcolor}{rgb}{0.86, 0.58, 0.35} % Ключевые слова (оранжевый)
+\definecolor{stringcolor}{rgb}{0.72, 0.92, 0.53} % Строки (зеленый)
+\definecolor{commentcolor}{HTML}{005000} % Комментарии (серый)
+\definecolor{numbercolor}{rgb}{0.75, 0.75, 0.75} % Номера строк (светло-серый)
+\definecolor{identifiercolor}{rgb}{0.60, 0.60, 1.00} % Идентификаторы (светло-синий)
+\definecolor{keywordtypcolor}{rgb}{0.57, 0.81, 1.00} % Типы данных (голубой)
+
+% Настройка подсветки синтаксиса
+\lstset{
+    language=Fortran,
+   basicstyle=\ttfamily\fontsize{10}{12}\selectfont, % Моноширный основной стиль текста
+   backgroundcolor=\color{backgroundcolor}, % Цвет фона
+   % commentstyle=\color{commentcolor}\itshape, % Стиль комментариев
+    numbers=left,
+    numberstyle=\tiny,
+    stepnumber=1,
+    showstringspaces=false,
+    tabsize=2,
+    breaklines=true, % Автоматический перенос строк
+    postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space},
+    frame=none, % Убрать рамку вокруг кода
+    captionpos=b, % Заголовок (caption) снизу и центрирован
+    literate=% Поддержка кириллицы в комментариях (маленькие и большие буквы)
+    {а}{{\selectfont\char224}}1
+    {б}{{\selectfont\char225}}1
+    {в}{{\selectfont\char226}}1
+    {г}{{\selectfont\char227}}1
+    {д}{{\selectfont\char228}}1
+    {е}{{\selectfont\char229}}1
+    {ё}{{\"e}}1
+    {ж}{{\selectfont\char230}}1
+    {з}{{\selectfont\char231}}1
+    {и}{{\selectfont\char232}}1
+    {й}{{\selectfont\char233}}1
+    {к}{{\selectfont\char234}}1
+    {л}{{\selectfont\char235}}1
+    {м}{{\selectfont\char236}}1
+    {н}{{\selectfont\char237}}1
+    {о}{{\selectfont\char238}}1
+    {п}{{\selectfont\char239}}1
+    {р}{{\selectfont\char240}}1
+    {с}{{\selectfont\char241}}1
+    {т}{{\selectfont\char242}}1
+    {у}{{\selectfont\char243}}1
+    {ф}{{\selectfont\char244}}1
+    {х}{{\selectfont\char245}}1
+    {ц}{{\selectfont\char246}}1
+    {ч}{{\selectfont\char247}}1
+    {ш}{{\selectfont\char248}}1
+    {щ}{{\selectfont\char249}}1
+    {ъ}{{\selectfont\char250}}1
+    {ы}{{\selectfont\char251}}1
+    {ь}{{\selectfont\char252}}1
+    {э}{{\selectfont\char253}}1
+    {ю}{{\selectfont\char254}}1
+    {я}{{\selectfont\char255}}1
+    {А}{{\selectfont\char192}}1
+    {Б}{{\selectfont\char193}}1
+    {В}{{\selectfont\char194}}1
+    {Г}{{\selectfont\char195}}1
+    {Д}{{\selectfont\char196}}1
+    {Е}{{\selectfont\char197}}1
+    {Ё}{{\"E}}1
+    {Ж}{{\selectfont\char198}}1
+    {З}{{\selectfont\char199}}1
+    {И}{{\selectfont\char200}}1
+    {Й}{{\selectfont\char201}}1
+    {К}{{\selectfont\char202}}1
+    {Л}{{\selectfont\char203}}1
+    {М}{{\selectfont\char204}}1
+    {Н}{{\selectfont\char205}}1
+    {О}{{\selectfont\char206}}1
+    {П}{{\selectfont\char207}}1
+    {Р}{{\selectfont\char208}}1
+    {С}{{\selectfont\char209}}1
+    {Т}{{\selectfont\char210}}1
+    {У}{{\selectfont\char211}}1
+    {Ф}{{\selectfont\char212}}1
+    {Х}{{\selectfont\char213}}1
+    {Ц}{{\selectfont\char214}}1
+    {Ч}{{\selectfont\char215}}1
+    {Ш}{{\selectfont\char216}}1
+    {Щ}{{\selectfont\char217}}1
+    {Ъ}{{\selectfont\char218}}1
+    {Ы}{{\selectfont\char219}}1
+    {Ь}{{\selectfont\char220}}1
+    {Э}{{\selectfont\char221}}1
+    {Ю}{{\selectfont\char222}}1
+    {Я}{{\selectfont\char223}}1
+}
+
+\captionsetup[table]{justification=raggedright, singlelinecheck=false} % Выравнивание подписи по левому краю
+
+% Установка стиля заголовков разделов: центрирование без номера
+\titleformat{\section}[block]{\Large\bfseries\centering}{}{0pt}{}
+
+\title{3.1 Титульный лист}
+
+\begin{document}
+
+\thispagestyle{empty}    % Отключаем колонтитулы
+
+\begin{center}
+    Санкт-Петербургский политехнический университет Петра Великого\\
+    Институт компьютерных наук и технологий\\
+    \bfseries{Высшая школа программной инженерии}
+\end{center}
+
+\vspace{20ex} % Задаем размер вертикального промежутка в явном виде
+
+\begin{center}
+    \begin{huge} {\bfseries{\scshape курсовая работа}} \end{huge}
+
+    \vspace{3ex}
+
+    по дисциплине: «Алгоритмы и структуры данных»
+\end{center}
+
+\vspace{30ex}
+
+\noindent Выполнила\\
+студентка гр. в5130904/30022\hfill \begin{minipage}{0.6\textwidth} \hfill Г.М.Феллер\end{minipage}
+
+\vspace{3ex}
+
+\noindent Руководитель\\
+старший преподаватель\hfill \begin{minipage} {0.6\textwidth}\hfill С.А.Федоров\end{minipage}
+
+\vspace{3ex}
+
+\hfill \begin{minipage}{0.6\textwidth} \hfill «\underline{\hspace{1cm}}»\underline{\hspace{3cm}} 2024 г.\end{minipage}
+
+\vfill
+
+\begin{center}
+    Санкт-Петербург\\ 
+    2024
+\end{center}
+
+\newpage % Начинаем новую страницу\
+
+% Отключение нумерации разделов в заголовках разделов и подразделов
+\titleformat{\section}[block]{\Large\bfseries\centering}{}{0pt}{}
+
+% Настройка заголовков подразделов с использованием символа "§" и собственной нумерации
+\renewcommand{\thesubsection}{\S\arabic{subsection}}
+\titleformat{\subsection}[block]{\large\bfseries}{\thesubsection}{1em}{}
+% Установка автоматического сброса счетчика подразделов при начале нового раздела
+
+% Определение стиля оглавления
+\titlecontents{section}[0pt] % Left indent
+{\vspace{0.5ex}\hspace{1em}} % Above code and left spacing
+{} % Numbered entry format (empty to remove numbers)
+{} % Numberless entry format
+{\titlerule*[1pc]{.}\contentspage} % Filler-page format
+
+% Настройка стиля заголовка Содержания с выравниванием по левому краю
+\renewcommand{\contentsname}{\leftline{\fontsize{24.5pt}{30pt}\selectfont Содержание}}
+
+\tableofcontents
+
+\newpage
+
+\section{Задачи курсовой работы}
+
+\noindent Дан список владельцев телефонов в виде:
+
+\begin{verbatim}
+ФАМИЛИЯ    ТЕЛЕФОН
+15 симв.   10 симв.
+\end{verbatim}
+Пример входного файла:
+\begin{verbatim}
+Петров         9111634576
+Фёдоров        9111635687
+\end{verbatim}
+Отсортировать этот список в порядке убывания номеров телефонов, используя метод вставок. {\newline} 
+{\newline}Пример выходного файла:
+\begin{verbatim}
+Петров         9111634576
+Фёдоров        9111635687
+\end{verbatim}
+
+\newpage
+
+\section{Введение}
+Цель курсовой работы - выбор структуры данных для решения поставленной задачи на современных микроархитектурах.{\newline}
+Для достижения поставленной цели нехободимо выполнить следующие задачи:
+\begin{enumerate}
+    \item Реализовать задание с использованием массивов строк.
+    \item Реализовать задание с использованием массивов символов.
+    \item Реализовать задание с использованием массивов структур.
+    \item Реализовать задание с использованием структур массивов.
+    \item Реализовать задание с использованием массивов структур или структур массивов (на выбор) и с использованием хвостовой рекурсии при обработке данных.
+    \item Реализовать задание с использованием динамического списка.
+    \item Провести анализ на регулярный доступ к памяти.
+    \item Провести анализ на векторизацию кода.
+    \item Провести сравнительный анализ реализаций.
+\end{enumerate}
+
+\newpage
+
+\section{Глава 1. Реализация и анализ применения различных структур данных}
+\subsection{Массив строк}
+
+Для хранения телефонных номеров используется одномерный массив целых чисел. Так как телефонный номер могут быть любым целочисленным 10-ти символьным числом, нужно учитывать, что значения большинства номеров будут превышать максимальное значение, которое может быть представлено 32-битным целочисленным типом \texttt{integer(kind=4)}, что составляет \texttt{2,147,483,647}. Поэтому, для корректного хранения, необходимо использовать 64-битный целочисленный тип \texttt{integer(kind=8)}, который иммет гораздо больший диапазон. Данный параметр задан в модуле \texttt{environment.f90}
+\begin{lstlisting}[caption={Разновидность типа для целочисленных переменных}]
+integer, parameter      :: I_ = INT64 
+\end{lstlisting}
+
+Для первого варианта реализации курсового проекта хранение данных происходит с использованием массива строк для хранения фамилий и массива целочисленных чисел для хранения телефонных номеров. 
+
+\begin{lstlisting}[caption={Инициализация массивов для хранения исходных данных}]
+character(OWNER_LEN, kind=CH_) :: Owners(PHONE_AMOUNT)
+integer(I_)                    :: Phones(PHONE_AMOUNT)
+\end{lstlisting}
+
+Основные операторы ввода и вывода данных:
+
+\begin{lstlisting}[caption={Ввод и вывод данных}]
+! Чтение списка телефонных номеров
+open (file=input_file, encoding=E_, newunit=In)
+   format = '(A15, 1x, I10)'
+   read(In, format, iostat=IO) (Owners(i), Phones(i), i = 1, PHONE_AMOUNT)
+   call Handle_IO_status(IO, "reading phonebook list")
+close (In)
+
+! Вывод списка
+open(file=output_file, encoding=E_, position=position, newunit=Out)
+   write(Out, '(/a)') list_name
+   format = '(A15, 1x, I10)'
+   write(Out, format, iostat=io) (Owners(i), Phones(i), i = 1, PHONE_AMOUNT)
+   call Handle_IO_status(IO, "writing phonebook")
+close(Out)
+\end{lstlisting}
+
+Сортировка вставками (Insertion Sort) - это алгоритм сортировки, на каждом шаге которого массив постепенно перебирается слева направо. При этом каждый последующий элемент размещается таким образом, чтобы он оказался между двумя ближайшими элементами с минимальным и максимальным значением. Вычислительня сложность - \( O(n^2) \).
+
+Цикл \texttt{do concurrent} предполагает, что итерации могут выполняться параллельно, что позволяет значительно ускорить выполнение программы на многопроцессорных системах.
+
+Внутренний цикл \texttt{do while} выполняется до тех пор пока индекс j не станет меньше 1 или значение \texttt{Phones(j)} больше либо равно значению \texttt{Phones(i)}. Это нужно для нахождения позиции, куда должен быть вставлен текущий элемент \texttt{Phones(i)}.
+
+После того, как найдена подходящая позиция, происходит сдвиг элементов массивов \texttt{Owners} и \texttt{Phones}. Функци \texttt{cshift} (циклический сдвиг) сдвигает элементы на 1 вправо, освобождая место для вставки текущего элемента. За счет использования данной функции возможна потенциальная векторизация.
+
+\begin{lstlisting}[caption={Сортировка методом вставок}, label={lst:example}]
+do concurrent(i = 2:PHONE_AMOUNT)
+   j = i - 1
+   do while (j >= 1 .and. Phones(j) < Phones(i))
+         j = j - 1
+   end do
+   Owners(j+1:i) = cshift(Owners(j+1:i), -1)
+   Phones(j+1:i) = cshift(Phones(j+1:i), -1)
+end do
+\end{lstlisting}
+
+При компиляции выполняется векторизация за счет использования функции \texttt{cshift}.
+
+\begin{lstlisting}[caption={Векторизация при компиляции}]
+src/phonebook_process.f90:22:53: optimized: basic block part vectorized using 16 byte vectors
+src/phonebook_process.f90:22:53: optimized: basic block part vectorized using 16 byte vectors
+src/phonebook_process.f90:22:53: optimized: basic block part vectorized using 16 byte vectors
+src/phonebook_process.f90:23:53: optimized: basic block part vectorized using 16 byte vectors
+src/phonebook_process.f90:23:53: optimized: basic block part vectorized using 16 byte vectors
+src/phonebook_process.f90:23:53: optimized: basic block part vectorized using 16 byte vectors
+\end{lstlisting}
+
+\subsection{Массив символов}
+
+В данной реализации решения, для хранения фамилий были использованы массивы символов. В одном случае решение реализовано без регулярного доступа к памяти. Во второй реализации решения регулярный доступ к памяти обеспечен (благодаря этому при получении данных строка будет сплошной).
+
+При этом подход к хранению массива целочисленных значений телефонных номеров не менялся. 
+
+\begin{lstlisting}[caption={Инициализация массивов с нерегулярным доступом}]
+! Массивы фамилий и телефонов. Array(i, j), i - строка, j -столбец 
+character(kind=CH_)     :: Owners(PHONE_AMOUNT, OWNER_LEN) = ""
+integer(I_)             :: Phones(PHONE_AMOUNT)
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Инициализация массивов с регулярным доступом}]
+! Массивы фамилий и телефонов. Array(j, i): j - столбец, i - строка
+character(kind=CH_) :: Owners(OWNER_LEN, PHONE_AMOUNT) = ""
+integer(I_)         :: Phones(PHONE_AMOUNT)
+\end{lstlisting}
+
+В дальнейших листингах решения с использованием массива символов будет представлен код для варианта с регулярным доступом к памяти.
+
+Основные операторы ввода вывода данных.
+\begin{lstlisting}[caption={Ввод и вывод данных}]
+! Чтение списка телефонных номеров.
+open (file=Input_File, encoding=E_, newunit=In)
+   format = '(' // OWNER_LEN // 'A1, 1x, I10)'
+   ! Храним по столбцам (j, i)
+   read (In, format, iostat=IO) (Owners(:, i), Phones(i), i = 1, PHONE_AMOUNT)
+   call Handle_IO_status(IO, "reading phone list")
+close (In)
+
+! Вывод списка.
+open (file=output_file, encoding=E_, position=position, newunit=Out)
+   write (out, '(/A)') List_name
+   format = '(' // OWNER_LEN // 'A1, 1x, I10)'
+   write (Out, format, iostat=IO) (Owners(:, i), Phones(i), i = 1, PHONE_AMOUNT)
+   call Handle_IO_status(IO, "writing " // List_name)
+close (Out)
+\end{lstlisting}
+
+Функция сортировки аналогична представленной в листинге \ref{lst:example}. Меняется только вставка фамилий на нужную позицию с учетом того, что данные хранятся в двумерном массиве символов. 
+
+В данной реализации также будет обеспечена потенциальная векторизация за счет использования функции \texttt{cshift} (при компиляции векторизация выполняется). Так как сравнение и обход элементов выполняется только на массиве \texttt{Phones}, а в массиве \texttt{Owners} выполняется только вставка элемента на нужную позицию, векторизация за счет регулярного доступа не может быть гарантирована.
+
+\begin{lstlisting}[caption={Сортировка массива символов}]
+Owners(:, j+1:i) = cshift(Owners(:, j+1:i), -1, dim=2)
+\end{lstlisting}
+
+\subsection{Массив структур}
+
+В этом проекте в качестве структуры данных использовались массивы структур для данных о фамилиях владельцев и телефонных номерах.
+
+\begin{lstlisting}[caption={Структура для хранения данных}]
+type phonebook
+   character(OWNER_LEN, kind=CH_) :: Owners = ""
+   integer(I_)                    :: Phones = 0
+end type phonebook
+\end{lstlisting}
+
+При чтении из файла, вначале входные данные записываются в создаваемый двоичный файл. После считываются в производную структуру данных.
+\begin{lstlisting}[caption={Ввод и вывод данных. Создание двоичного файла.}]
+! Создание двоичного файла
+open (file=Input_File, encoding=E_, newunit=In)
+recl = OWNER_LEN * CH_ + I_
+open (file=Data_File, form='unformatted', newunit=Out, access='direct', recl=recl)
+   format = '(A15, 1x, I10)'
+   do i = 1, PHONE_AMOUNT
+      read (In, format, iostat=IO) phone
+      call Handle_IO_status(IO, "reading formatted phonebook list, line " // i)
+      
+      write (Out, iostat=IO, rec=i) phone
+      call Handle_IO_status(IO, "creating unformatted file with phonebook list, record " // i)
+   end do
+close (In)
+close (Out)
+
+! Чтение списка: фамилии и телефонные номера.
+recl = (OWNER_LEN * CH_ + I_) * PHONE_AMOUNT
+open (file=Data_File, form='unformatted', newunit=In, access='direct', recl=recl)
+   read (In, iostat=IO, rec=1) Phone_list
+   call Handle_IO_status(IO, "reading unformatted class list")
+close (In)
+
+! Вывод списка.
+open (file=Output_File, encoding=E_, position=Position, newunit=Out)
+   write (out, '(/a)') List_name
+   format = '(A15, 1x, I10)'
+   write (Out, format, iostat=IO) Phone_list
+   call Handle_IO_status(IO, "writing " // List_name)
+close (Out)
+\end{lstlisting}
+
+Из-за отличая структуры данных, меняется код сортировки списка телефонных номеров - не нужно отдельно сортировать фамилии и телефонные номера, выполняется сортировка массива структур. В данной реализации также будет обеспечена потенциальная векторизация за счет использования функции \texttt{cshift} (векторизация выполняется при компиляции программы).
+
+\begin{lstlisting}[caption={Сортировка массива структур}]
+do i = 2, PHONE_AMOUNT
+   j = i - 1
+   do while (j >= 1 .and. Phone_list(j)%Phones < Phone_list(i)%Phones)
+         j = j - 1
+   end do
+   Phone_list(j + 1:i) = cshift(Phone_list(j+1:i), -1, dim=1)
+end do
+\end{lstlisting}
+
+\subsection{Структура массивов}
+
+В данном проекте вместо массива структур используется структура массивов.
+
+\begin{lstlisting}[caption={Структура массивов фамилий и номеров телефонов}]
+type phonebook
+   character(OWNER_LEN, kind=CH_), allocatable :: owner(:)
+   integer(I_), allocatable                    :: phone(:)
+end type phonebook
+\end{lstlisting}
+
+При чтении из файла, входные данные вначале записываются в создаваемый двоичный файл. После, они считываются оттуда в производную структуру данных:
+
+\begin{lstlisting}[caption={Ввод и вывод данных. Создание двоичного файла}, label={lst:array_io}]
+! Создание неформатированного файла данных.
+open (file=input_file, encoding=E_, newunit=In)
+   format = '(a15, 1x, i10)'
+   read (In, format, iostat=IO) (tmp_owner(i), tmp_phone(i), i = 1, PHONE_AMOUNT)
+   call Handle_IO_status(IO, "reading formatted group list, line " // i)
+close (In)
+
+open (file=data_file, form='unformatted', newunit=Out, access='stream')               
+   write (Out, iostat=IO) tmp_owner, tmp_phone
+   call Handle_IO_status(IO, "creating unformatted file with group list, record " // i)
+close (Out)
+
+! Чтение списка.
+open (file=Data_File, form='unformatted', newunit=In, access='stream')
+   allocate(phonepage%owner(PHONE_AMOUNT), phonepage%phone(PHONE_AMOUNT))
+   read (In, iostat=IO) phonepage%owner, phonepage%phone
+   call Handle_IO_status(IO, "reading unformatted class list")
+close (In)
+ 
+! Вывод списка.
+open (file=Data_File, form='unformatted', newunit=In, access='stream')
+   allocate(phonepage%owner(PHONE_AMOUNT), phonepage%phone(PHONE_AMOUNT))
+   read (In, iostat=IO) phonepage%owner, phonepage%phone
+   call Handle_IO_status(IO, "reading unformatted class list")
+close (In)
+\end{lstlisting}
+
+Сортировка массивов выполняется аналогично реализации в §1. В данной реализации также обеспечена потенциальная векторизация за счет использования функции \texttt{cshift} (векторизация выполняется при компиляции программы).  
+
+\begin{lstlisting}[caption={Сортировка структуры массивов}]
+do concurrent (i = 2:PHONE_AMOUNT)
+   j = i - 1
+   do while (j >= 1 .and. phonepage%phone(j) < phonepage%phone(i))
+      j = j - 1
+      if (j == 0) exit
+   end do
+   phonepage%owner(j+1:i) = cshift(phonepage%owner(j+1:i), -1)
+   phonepage%phone(j+1:i) = cshift(phonepage%phone(j+1:i), -1)
+end do
+\end{lstlisting}
+
+\subsection{Хвостовая рекурсия}
+
+В данном проекте структура данных – структура массивов, обработка которой производится посредством хвостовой рекурсии. Хвостовая рекурсия требует, чтобы рекурсивный вызов являлся последней операцией в функции или подпрограмме.
+
+\begin{lstlisting}[caption={Структура для хранения данных}]
+type phonebook
+   character(OWNER_LEN, kind=CH_), allocatable :: owner(:)
+   integer(I_), allocatable                    :: phone(:)
+end type phonebook
+\end{lstlisting}
+
+Ввод и вывод данных аналогичен реализации представленной в листинге \ref{lst:array_io}.
+
+В функции \texttt{Sort\_phone\_list} рекурсивный вызов \texttt{call Sort\_phone\_list(Phone\_List, i+1)} является последним действием перед выходом из подпрограммы. 
+Использование хвостовой рекурсии позволяет компилятору оптимизировать код, преобразовывая рекурсивные вызовы в итерации и сокращая использование стека. В данной реализации также обеспечена потенциальная векторизация за счет использования функции \texttt{cshift} (векторизация выполняется при компиляции программы).
+
+\begin{lstlisting}[caption={Реализация сортировки с использованием хвостовой рекурсии}]
+pure recursive subroutine Sort_phone_list(phonepage, i)
+   type(phonebook), intent(inout) :: phonepage
+   integer :: j
+   integer, intent(in) :: i
+
+   j = i - 1
+
+   do while (j >= 1 .and. (phonepage%phone(j) < phonepage%phone(i)))
+      j = j - 1
+   end do
+
+   phonepage%owner(j+1:i) = cshift(phonepage%owner(j+1:i), -1)
+   phonepage%phone(j+1:i) = cshift(phonepage%phone(j+1:i), -1)
+   
+   if (i <= PHONE_AMOUNT) &
+      call Sort_phone_list(phonepage, i+1)
+
+end subroutine Sort_phone_list
+\end{lstlisting}
+
+\subsection{Динамический список}
+
+В первом варианте решение реализовано с использованием динамического однонаправленного списка (\texttt{pointer}). 
+Второй вариант решения - с использованием рекурсивно размещаемого типа (\texttt{allocatable}).
+
+\begin{lstlisting}[caption={Динамический список, объявленный через pointer}]
+type phonebook
+   character(OWNER_LEN, kind=CH_) :: owner = ""
+   integer(I_)                    :: phone = 0
+   type(phonebook), pointer       :: next  => Null()
+end type phonebook
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Динамический список, объявленный через allocatable}]
+type phonebook
+   character(OWNER_LEN, kind=CH_) :: owner = ""
+   integer(I_)                    :: phone = 0
+   type(phonebook), allocatable   :: next
+end type phonebook
+\end{lstlisting}
+
+Ввод и вывод данных.
+
+\begin{lstlisting}[caption={Чтение и вывод данных (динамический однонаправленный список)}]
+! Чтение списка фамилии и телефоны.
+function Read_phone_list(Input_File) result(Phone_List)
+   type(phonebook), pointer   :: Phone_List
+   character(*), intent(in)   :: Input_File
+   integer  In
+
+   open (file=Input_File, encoding=E_, newunit=In)
+      Phone_List => Read_phone(In)
+   close (In)
+end function Read_phone_list
+! Чтение следующего значения.
+recursive function Read_phone(In) result(Phone_List)
+   type(phonebook), pointer  :: Phone_List
+   integer, intent(in)       :: In
+   character(:), allocatable :: format
+   integer  IO
+   
+   allocate (Phone_List)
+   format = '(A15, 1x, i10)'
+   read (In, format, iostat=IO) Phone_List%owner, Phone_List%phone
+   call Handle_IO_status(IO, "reading line from file")
+   if (IO == 0) then
+      Phone_List%next => Read_phone(In)
+   else
+      deallocate (Phone_List)
+   end if
+end function Read_phone
+
+! Вывод списка.
+subroutine Output_phone_list(Output_File, Phone_List, List_Name, Position)
+   character(*), intent(in)    :: Output_File, Position, List_Name
+   type(phonebook), intent(in) :: Phone_List
+   integer                     :: Out
+   
+   open (file=Output_File, encoding=E_, position=Position, newunit=Out)
+      write (out, '(/a)') List_Name
+      call Output_phones(Out, Phone_List)
+   close (Out)
+end subroutine Output_phone_list
+recursive subroutine Output_phones(Out, phonepage)
+   type(phonebook), intent(in) :: phonepage
+   integer, intent(in)         :: Out
+   character(:), allocatable   :: format
+   integer                     :: IO
+   
+   format = '(A15, 1x, i10)'
+   write (Out, format, iostat=IO) phonepage%owner, phonepage%phone
+   call Handle_IO_status(IO, "writing owners&phones")
+   if (Associated(phonepage%next)) &
+      call Output_phones(Out, phonepage%next)
+end subroutine Output_phones
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Чтение и вывод данных (рекурсивно размещаемый тип)}]
+! Чтение списка фамилии и телефоны.
+function Read_phone_list(Input_File) result(Phone_List)
+   type(phonebook), allocatable :: Phone_List
+   character(*), intent(in)     :: Input_File
+   integer  In
+
+   open (file=Input_File, encoding=E_, newunit=In)
+      call Read_phone(In, Phone_List)
+   close (In)
+end function Read_phone_list
+
+! Чтение следующей записи.
+recursive subroutine Read_phone(In, phonepage)
+   type(phonebook), allocatable :: phonepage
+   integer, intent(in)          :: In
+   character(:), allocatable    :: format
+   integer  IO
+   
+   allocate (phonepage)
+   format = '(A15, 1x, i10)'
+   read (In, format, iostat=IO) phonepage%owner, phonepage%phone
+   call Handle_IO_status(IO, "reading line from file")
+   if (IO == 0) then
+      call Read_phone(In, phonepage%next)
+   else
+      deallocate (phonepage)
+   end if
+end subroutine Read_phone
+
+! Вывод списка.
+subroutine Output_phone_list(Output_File, Phone_List, List_Name, Position)
+   character(*), intent(in)     :: Output_File, Position, List_Name
+   type(phonebook), allocatable :: Phone_List
+   integer  :: Out
+   
+   open (file=Output_File, encoding=E_, position=Position, newunit=Out)
+      write (out, '(/a)') List_Name
+      call Output_phones(Out, Phone_List)
+   close (Out)
+end subroutine Output_phone_list
+
+recursive subroutine Output_phones(Out, phonepage)
+   type(phonebook), allocatable :: phonepage
+   character(:), allocatable    :: format
+   integer, intent(in)          :: Out
+   integer                      :: IO
+
+   format = '(A15, 1x, i10)'
+   if (allocated(phonepage)) then 
+      write (Out, format, iostat=IO) phonepage%owner, phonepage%phone 
+      call Handle_IO_status(IO, "writing owners&phones")
+      call Output_phones(Out, phonepage%next)
+   end if
+end subroutine Output_phones
+\end{lstlisting}
+
+
+Доступ к памяти производится по ссылкам, поэтому векторизация не задействуется.
+Сортировка вставками реализована с помощью хвостовой рекурсии. 
+
+Для первого варианта реализации сортировка выполняется с использованием поля \texttt{next}.
+
+\begin{lstlisting}[caption={Сортировка методом вставок}]
+pure recursive subroutine Sort_phone_list(Phone_list, Sorted_list)
+   type(phonebook), pointer :: Phone_list, temp, Sorted_list
+
+   if (associated(Phone_list)) then
+      ! Указатель на текущий элемент сохраняется во временной переменной.
+      temp => Phone_list
+      ! Перемещаем указатель на следующий элемент списка.
+      Phone_list => Phone_list%next
+      ! Обнуляем указатель на следующий элемент временной переменной.
+      temp%next => null()
+      ! Вызываем подпрограмму вставки для вставки временного элемента в отсортированный список.
+      call Insertion(Sorted_list, temp)
+      ! Рекурсивно вызываем эту же функцию для оставшихся элементов списка.
+      call Sort_phone_list(Phone_list, Sorted_list)
+   end if
+end subroutine Sort_phone_list
+
+pure recursive subroutine Insertion(Sorted_list, temp)
+   type(phonebook), pointer :: Sorted_list, temp
+
+   if (.not. associated(Sorted_list) .or. Sorted_list%phone < temp%phone) then
+      ! Временный элемент становится первым в списке.
+      temp%next => Sorted_list
+      Sorted_list => temp
+   else 
+      ! Рекурсивно вызываем эту же функцию для следующего элемента списка.
+      call Insertion(Sorted_list%next, temp)
+   end if
+end subroutine Insertion
+\end{lstlisting}
+
+Во втором варианте реализации, обмен элементов массива происходит с помощью встроенной команды \texttt{move\_alloc}. Оператор \texttt{move\_alloc} используется для передачи аллоцированной памяти и связей между узлами списка, минимизируя необходимость дополнительного копирования данных. Этот метод обеспечивает эффективную перестановку узлов без потери данных и сохранения структуры списка.
+
+\begin{lstlisting}[caption={Сортировка телефонных номеров методом вставок с помощью move\_alloc}]
+pure recursive subroutine Sort_phone_list(Phone_list, Sorted_list)
+   type(phonebook), allocatable, intent(inout) :: Phone_list, Sorted_list
+   type(phonebook), allocatable :: temp
+
+   if (Allocated(Sorted_list%next)) then
+      if (Sorted_list%phone < Sorted_list%next%phone) then
+         call move_alloc(Sorted_list%next, temp)
+         call move_alloc(temp%next, Sorted_list%next)
+
+         call Insertion(Phone_list, temp)
+         call Sort_phone_list(Phone_List, Sorted_list)
+
+      else
+         call Sort_phone_list(Phone_List, Sorted_list%next)
+      end if
+   end if
+end subroutine Sort_phone_list
+
+pure recursive subroutine Insertion(Sorted_list, temp)
+   type(phonebook), allocatable, intent(inout) :: Sorted_list, temp
+
+   if (Sorted_list%phone < temp%phone) then
+      ! Временный элемент становится первым в списке.
+      call move_alloc(Sorted_list, temp%next)
+      call move_alloc(temp, Sorted_list)
+   else 
+      ! Рекурсивно вызываем эту же функцию для следующего элемента списка.
+      call Insertion(Sorted_list%next, temp)
+   end if
+
+end subroutine Insertion
+\end{lstlisting}
+\newpage
+
+\section{Глава 2. Сравнение реализаций}
+
+Ниже приведена сравнительная таблица реализаций по критериям: сплошные данные, регулярный доступ, векторизация, потенциальная векторизация, а также по показателям: время работы при обработке данных в секундах, сложность участка кода по количеству строк и эффективность участка кода по обработке данных возведенная в $10^6$.
+
+\begin{table}[htbp]
+\caption{Анализ набора средств}
+\small
+\setlength{\tabcolsep}{2pt} % Уменьшение ширины столбцов
+\renewcommand{\arraystretch}{1} % Уменьшение высоты строк
+\begin{tabular}{|p{5.8cm}|>{\centering\arraybackslash}p{1.2cm}|>{\centering\arraybackslash}p{1.2cm}|>{\centering\arraybackslash}p{1.2cm}|>{\centering\arraybackslash}p{1.2cm}|>{\centering\arraybackslash}p{1.2cm}|>{\centering\arraybackslash}p{1.2cm}|>{\centering\arraybackslash}p{1.2cm}|>{\centering\arraybackslash}p{1.2cm}|} % Добавление границ в таблицу
+\hline
+Набор средств & 1 & 2a & 2b & 3 & 4 & 5 & 6a & 6b \\ 
+\hline
+Сплошные данные & + & - & + & + & + & + & - & - \\
+\hline
+Регулярный доступ & + & - & + & + & + & + & - & - \\
+\hline
+Векторизация & + & + & + & + & + & + & - & - \\
+\hline
+Потенциальная векторизация & + & + & + & + & + & + & - & - \\
+\hline
+Объем данных (кол-во записей) & 90000 & 90000 & 90000 & 90000 & 90000 & 37400* & 13500* & 13500* \\
+\hline
+Время работы при обработке данных & 12,041 & 10,576 & 12,728 & 8,722 & 12,943 & 1,368 & 0,299 & 0,306 \\
+\hline
+Сложность кода по обработке данных & 8 & 8 & 8 & 7 & 9 & 8 & 13 & 16 \\
+\hline
+Эффективность при обработке данных & 10381 & 14576 & 9821 & 16379 & 8585 & 12913 & 257268 & 204248 \\
+\hline
+\end{tabular}
+\end{table}
+
+
+*Максимальное число возможных обработанных данных до получения ошибки \texttt{Segmentation fault (core dumped)}
+
+\newpage
+
+\section{Заключение}
+В ходе работы было разработано 6 проектов для сортировки методом вставки списка телефонных номеров по убыванию и выполнены следующие задачи:
+\begin{enumerate}
+    \item Реализовано задание с использованием массивов строк.
+    \item Реализовано задание с использованием массивов символов.
+    \item Реализовано задание с использованием массивов структур.
+    \item Реализовано задание с использованием структур массивов.
+    \item Реализовано задание с использованием массивов структур или структур массивов (на выбор) и с использованием хвостовой рекурсии при обработке данных.
+    \item Реализовано задание с использованием динамического списка.
+    \item Проведен анализ на регулярный доступ к памяти.
+    \item Проведен анализ на векторизацию кода.
+    \item Проведен сравнительный анализ реализаций.
+\end{enumerate}
+
+Использование различных структур данных при которых данные по разному размещаются в оперативной памяти, влияет на эффективность при обработке данных. Исходя из данных сравнительной таблицы, наиболее оптимальной структурой данных для решения вышеупомянутой задачи на современной микроархитектуре Firestorm (Apple M1) является структура массивов.
+
+\end{document}
