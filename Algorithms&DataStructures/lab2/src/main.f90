@@ -34,47 +34,50 @@ program lab_2
    use Source_IO
 
    implicit none
-
-   character(*), parameter  :: input_file  = "../data/input.txt", &
-                               output_file = "output.txt"
-
-
-   type(StringList) :: string
-
-   ! Чтение строки из стандартного ввода
-   call read_line_from_console(head, char_count)
-   ! Выводим считанную строку
-   call print_line(head)
-   ! print *, ""
-
-   ! ! Чтение команд из входного файла
-   ! call read_input_file('input.txt', commands, n_commands)
-
-   ! ! Выполнение команд из файла
-   ! do i = 1, n_commands
-   !    ! Выполняем текущую команду
-   !    call commands(i)%execute(head)
-   !    ! Вывод обновленной строки
-   !    call print_line(head)
-   !    print *, ""
-   ! end do
-
-   ! type(ListLines), pointer :: line => Null() 
-
-   ! Line = Read_first_line(input_file, line)
-   
-   ! Input => Read_commands(input_file)
-
-   ! ! Вывод исходной строки
-   ! call printString(Input)
-   
-   ! call Output_Source_File(output_file, Input)
+   character(*), parameter :: input_file = "../data/input.txt", &
+                              output_file = "output.txt"
   
-   ! ! if (Associated(InitialCode) .and. Associated(ModdedCode)) then
-   ! !    DiffCode => Diff_Codes(InitialCode, ModdedCode)
-      
-   ! !    if (Associated(DiffCode)) &
-   ! !    call Output_Source_Code(F3, DiffCode)
-   ! ! end if
+   
+   type(string), allocatable :: source_line ! исходная строка
+   type(command), allocatable :: command_line 
+   logical :: end_of_file
+   integer(I_) :: In, IO
+
+   open(file=input_file, newunit=In, iostat=IO, encoding=E_)
+   ! чтение исходной строки из файла к которой будут применяться команды
+   source_line = read_string(In)
+   ! вывод исходной строки
+   call write_string(output_file, source_line, "rewind")
+
+   ! открываем файл для чтения команд
+   
+   ! read(In, "(A)", advance="no") ! пропускаем первую строку
+   ! call Handle_IO_Status(IO, "Read first line")
+
+   ! чтение и выполнение команд
+   end_of_file = .false.
+
+   do while (.not. end_of_file)
+      command_line = read_command(In)
+      if (command_line%cmd_type == "") then
+         end_of_file = .true.
+         exit
+      end if
+
+      ! вывод команды перед выполнением
+      call write_command(output_file, command_line, "append")
+
+     ! select case (cmd%cmd_type)
+     ! case ('I') ! вставка
+     !    call insert_chars(source_line, cmd%pos, cmd%insert_str)
+     !    call write_string(output_file, source_line, "append")
+
+      !case ('D') ! удаление
+      !   call delete_chars(source_line, cmd%pos, cmd%num)
+      !   call write_string(output_file, source_line, "append")
+      !end select
+   end do
+
+   close(In)
 
 end program lab_2

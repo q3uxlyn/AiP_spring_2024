@@ -1,181 +1,134 @@
-! Copyright 2015 Fyodorov S. A.
-
 module Source_IO
    use Environment
-
    implicit none
-   public :: read_input_file, read_line_from_console, print_line
 
-   type :: Node
-      character(len=1) :: value
-      type(Node), pointer :: next => null()
-   end type Node
+   ! структура для хранения символа строки
+   type string
+      character(kind=CH_)       :: symbol = ""
+      type(string), allocatable :: next
+   end type string
 
-   type :: StringList
-      type(Node), pointer :: head => null()
+   type command
+      character                 :: cmd_type   ! тип команды: I - insert, D - delete 
+      integer(kind=I_)          :: pos        ! позиция для вставки/удаления
+      integer(kind=I_)          :: num        ! количество символов для удаления (если тип D)
+      type(string), allocatable :: insert_str ! строка для вставки (если тип I)
+   end type command
+
    contains
-      procedure, public :: insert_character => insert_character_impl
-      procedure, public :: delete_character => delete_character_impl
-      procedure, public :: to_string => to_string_impl
-   end type StringList
 
+      ! Чтение исходной строки
+      function read_string(In) result (source_line)
+         type(string), allocatable :: source_line
+         integer(I_), intent(in)   :: In
 
-contains
+         ! open (file=input_file, encoding=E_, newunit=In)
+         call read_char(In, source_line)
+         ! close (In)
+      end function read_string
 
-   ! Процедура для чтения строки из стандартного ввода и создания списка символов
-   recursive subroutine read_line_from_console(head, char_count)
-       type(ListElement), pointer :: head
-       integer :: char_count
+      recursive subroutine read_char(In, elem)
+         integer(I_), intent(in)   :: In
+         type(string), allocatable :: elem
+         integer                   :: IO
 
-       character(len=100) :: line
-       integer :: i
+         allocate(elem)
+         read(In, "(a1)", iostat=IO, advance="no") elem%symbol
+         call Handle_IO_Status(IO, "Reading symbol from source line")
+         if(IO == 0) then
+            call read_char(In, elem%next)
+         else
+            deallocate(elem)
+         end if
+      end subroutine read_char
 
-       ! Считываем строку из стандартного ввода
-       read(*, '(A)') line
-       do i = 1, len(trim(line))
-           ! Вставляем символы в список
-           call insert(head, char_count + 1, line(i))
-           char_count = char_count + 1
-       end do
-   end subroutine read_line_from_console
+      ! Вывод исходной строки
+      subroutine write_string(output_file, source_line, position)
+         character(*), intent(in)  :: output_file, position
+         type(string), allocatable :: source_line
+         integer                   :: Out
 
-   ! Процедура для вывода списка символов как строки
-   recursive subroutine print_line(node)
-       type(ListElement), pointer :: node
-       type(CharNode), pointer :: char_node
+         open (file=output_file, position=position, encoding=E_, newunit=Out)
+            call write_symbol(Out, source_line)
+         close (Out)
+      end subroutine write_string
 
-       if (associated(node)) then
-           select type(node)
-               type is (CharNode)
-                   char_node => node
-                   ! Выводим значение текущего узла
-                   write(*, '(A)', advance='no') char_node%value
-           end select
-           ! Рекурсивно вызываем для следующего узла
-           call print_line(node%next)
-       end if
-   end subroutine print_line
+      recursive subroutine write_symbol(Out, elem)
+         integer, intent(in)       :: Out
+         type(string), allocatable :: elem
+         integer :: IO
+         
+         if(allocated(elem)) then
+            write (Out, "(a1)", iostat=IO, advance="no") elem%symbol
+            call Handle_IO_Status(IO, "Writing symbol to file")
+            call write_symbol(Out, elem%next)
+         end if
+      end subroutine write_symbol 
 
-   ! Процедура для чтения команд из входного файла
-   subroutine read_input_file(filename, commands, n_commands)
-       character(len=*), intent(in) :: filename
-       type(ListElement), allocatable, intent(out) :: commands(:)
-       integer, intent(out) :: n_commands
+      ! подпрограмма для чтения команды из файла
+      function read_command(In) result (command_line)
+         type(command), allocatable :: command_line
+         integer(I_), intent(in)    :: In
 
-       integer :: unit, i
-       character(len=100) :: operation
-       integer :: position, count
-       character(len=100) :: text
+         integer :: IO
 
-       ! Открываем файл для чтения
-       open(newunit=unit, file=filename, status='old', action='read')
+         read(In, '(a1)', iostat=IO, advance="no") command_line%cmd_type
+         select case (command_line%cmd_type)
+            case ("I")
+               read(In, '(I1)') command_line%pos
+               call read_insert_string(In, command_line%insert_str)
+            case ("D")
+               read(In, *) command_line%pos, command_line%num
+         end select
+      end function read_command
 
-       ! Предварительный подсчет количества команд в файле
-       n_commands = 0
-       do
-           read(unit, '(A)', iostat=i)
-           if (i /= 0) exit
-           n_commands = n_commands + 1
-       end do
+      recursive subroutine read_insert_string(In, elem)
+         integer(I_), intent(in)   :: In
+         type(string), allocatable :: elem
+         integer :: IO
 
-       ! Возвращаемся в начало файла
-       rewind(unit)
+         allocate (elem)
+         read(In, "(A1)", iostat=IO, advance="no") elem%symbol
+         call Handle_IO_Status(IO, "Reading symbol for insert string")
+         if (IO == 0) then
+            call read_insert_string(In, elem%next)
+         else
+            deallocate(elem)
+         end if
+      end subroutine read_insert_string
 
-       ! Выделяем память для команд
-       allocate(commands(n_commands))
+      subroutine write_command(output_file, cmd, position)
+         character(*), intent(in)  :: output_file, position
+         integer :: Out
+         type(command), intent(in) :: cmd
+         integer :: IO
 
-       ! Считываем команды из файла
-       n_commands = 0
-       do
-           read(unit, '(A, I, I)', iostat=i) operation, position, count
-           if (i /= 0) exit
-           n_commands = n_commands + 1
-           select case (operation)
-               case ('D')
-                   ! Создаем команду удаления
-                   commands(n_commands) = DeleteCommand(position, count)
-               case ('I')
-                   read(unit, '(A)', iostat=i) text
-                   if (i /= 0) exit
-                   ! Создаем команду вставки
-                   commands(n_commands) = InsertCommand(position, trim(text))
-               case default
-                   ! Неподдерживаемая операция
-           end select
-       end do
+         open (file=output_file, position=position, encoding=E_, newunit=Out)
 
-       close(unit)
-   end subroutine read_input_file
-!    ! Структура данных для хранения строки исходного текста.
-!    type Commands
-!       character(CH_)   :: command
-!       integer(I_) :: place
-!       character(CH_) :: 
-!       type(Commands), pointer        :: Next  => Null()
-!    end type Commands
+         select case (cmd%cmd_type)
+         case ('I')
+            write (Out, "(A, I0, A)", iostat=IO, advance="no") cmd%cmd_type, cmd%pos, ' '
+            call write_insert_string(Out, cmd%insert_str)
+         case ('D') 
+            write (Out, "(A, A, I0, A, I0)", iostat=IO, advance="no") cmd%cmd_type, ' ', cmd%pos, ' ', cmd%num
+         end select
 
-! contains
-! function Read_first_line(InputFile) 
-!   ! Чтение исходного кода. 
-! function Read_Source_File(InputFile) result (First_line, Commands)
-!    character :: Command
-!    type(Commands), pointer  :: Command
-!    character(*), intent(in) :: InputFile
-!    integer  :: In
-   
-!    open (file=InputFile, encoding=E_, newunit=In)
-!       Code => Read_Source_Line(in)
-!    close (In)
-! end function Read_Source_File
+         call Handle_IO_Status(IO, "Writing command")
 
-! ! Чтение строки исходного кода.
-! recursive function Read_Source_Line(in) result(Code)
-!    type(SourceLine), pointer  :: Code
-!    integer, intent(in)        :: In
-!    integer, parameter      :: max_len = 1024
-!    character(max_len, CH_) :: string
-!    integer                 :: IO
+         close(Out)
+      end subroutine write_command
 
-!    ! Чтение строки во временную строку бОльшей длины.
-!    read (In, "(a)", iostat=IO) string
-!    call Handle_IO_Status(IO, "reading line from source code")
-!    if (IO == 0) then
-!       allocate (Code)
-!       ! Хранение в размещаемом поле символов без завершающих пробелов.
-!       Code%String = Trim(string)
-!       Code%Next => Read_Source_Line(In)
-!    else
-!       Code => Null()
-!    end if
-! end function Read_Source_Line
+      recursive subroutine write_insert_string(Out, elem)
+         integer, intent(in) :: Out
+         type(string), allocatable :: elem
+         integer :: IO
 
-! ! Вывод строки
-! subroutine printString(str)
-!    character(len=*), intent(in) :: str
-!    print *, str
-!  end subroutine printString
+         if (allocated(elem)) then
+            write(Out, "(a1)", iostat=IO, advance="no") elem%symbol
+            call Handle_IO_Status(IO, "Writing symbol for insert string")
+            call write_insert_string(Out, elem%next)
+         end if
 
-! ! Вывод исходного кода.
-! subroutine Output_Source_File(OutputFile, Code)
-!    character(*), intent(in)      :: OutputFile 
-!    type(SourceLine), intent(in)  :: Code 
-!    integer  :: Out
-   
-!    open (file=OutputFile, encoding=E_, newunit=Out)
-!       call Output_Source_Line(Out, Code)
-!    close (Out)
-! end subroutine Output_Source_File
-
-! ! Вывод строки исходного кода.
-! recursive subroutine Output_Source_Line(Out, Code)
-!    integer, intent(in)           :: Out
-!    type(SourceLine), intent(in)  :: Code
-!    integer  :: IO
-
-!    write (Out, "(a)", iostat=IO) Code%String
-!    call Handle_IO_Status(IO, "writing line to file")
-!    if (Associated(Code%next)) &
-!       call Output_Source_Line(Out, Code%next)
-! end subroutine Output_Source_Line
+      end subroutine write_insert_string
 
 end module Source_IO 
