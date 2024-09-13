@@ -1,92 +1,66 @@
-! Copyright 2019 Fyodorov S. A.
-
-module List_Process
-   ! Модуль с ЧИСТЫМИ процедурами обработки данных.
+module List_process
    use Environment
-   use List_IO
 
    implicit none
 
+   type node
+      character(kind=CH_) :: value = ''
+      type(node), allocatable :: next
+   end type node
+
 contains
-   pure recursive subroutine Put(Elem, value)
-      type(node), pointer  :: Elem
-      integer, intent(in)  :: value
 
-      if (.not. Associated(Elem)) then
-         allocate (Elem, source=node(value))
-         ! Можно было также:
-         ! allocate (Elem)
-         ! Elem%value = value
-         ! Elem%next => Null() ! Необязательно, если инициализируется как Null()
+   function Read_list(Input_File, is_set) result(List)
+      type(node), allocatable :: List
+      character(*), intent(in) :: Input_File
+      logical, intent(in) :: is_set
+      integer(I_)                :: In
+
+      open (file=Input_File, newunit=In)
+         call Read_value(In, List, is_set)
+      close (In)
+
+   end function Read_list
+
+   recursive subroutine Read_value(In, Elem, is_set)
+      type(node), allocatable :: Elem
+      integer, intent(in) :: In
+      logical, intent(in) :: is_set
+      integer :: IO
+
+      allocate (Elem)
+      read (In, '(a1)', iostat=IO, advance='no') Elem%value
+      call Handle_IO_status(IO, "reading value from file")
+
+      if (IO == 0) then
+         call Read_value(In, Elem%next, is_set)
       else
-        call Put(Elem%next, value)
-     end if
-   end subroutine Put
-
-   pure subroutine Get(List, value)
-      type(node), pointer, intent(inout)  :: List
-      integer, intent(out)  :: value
-      
-      type(node), pointer  :: tmp
-
-      if (Associated(List)) then
-         value = List%value
-         tmp => List ! tmp ссылается ТУДА ЖЕ, КУДА и List
-         List => List%next
-         deallocate (tmp)
-      else
-        value = 0
-     end if
-   end subroutine Get 
-
-   pure recursive subroutine Delete(current, value)
-      type(node), pointer  :: current
-      integer, intent(in)  :: value
-      
-      type(node), pointer  :: tmp
-      
-      if (Associated(current)) then
-         if (current%value == value) then
-            tmp => current
-            current => current%next
-            ! или current => tmp%next
-            deallocate(tmp)
-         else
-            call Delete(current%next, value)
-         end if
+         deallocate(Elem)
       end if
-   end subroutine Delete
+   end subroutine Read_value
 
-   pure recursive subroutine Delete_in_tree(current, value)
-      type(node_tree), pointer  :: current
-      integer, intent(in)  :: value
+   subroutine Output_list(Output_File, List, List_Name, Position)
+      character(*), intent(in) :: Output_File, List_Name, Position
+      type(node), allocatable :: List
+      integer :: Out
 
-      type(node_tree), pointer  :: left, right
-     
-      if (Associated(current)) then
-        if (current%value == value) then
-           left  => current%left
-           right => current%right
-           deallocate (current)
-           current => right
-           if (Associated(left)) &
-              call Put_to_left(current, left)
-        else if (current%value > value) then
-           call Delete_in_tree(current%left, value)
-        else if (current%value < value) then
-           call Delete_in_tree(current%right, value)
-        end if
+      open (file=Output_File, position=Position, newunit=Out)
+         write (out, '(/a)') List_Name
+         call Output_value(Out, List)
+      close (Out)
+
+   end subroutine Output_list
+
+   recursive subroutine Output_value(Out, Elem)
+      integer, intent(in) :: Out
+      type(node), allocatable :: Elem
+      integer :: IO
+
+      if (allocated(Elem)) then
+         write (Out, '(a1)', advance='no', iostat=IO) Elem%value
+         call Handle_IO_status(IO, "writing list")
+         call Output_value(Out, Elem%next)
       end if
-   end subroutine Delete_in_tree
+   end subroutine Output_value
 
-   pure recursive subroutine Put_to_left(current, left)
-      type(node_tree), pointer  :: current
-      type(node_tree), pointer  :: left
-
-      if (.not. Associated(current)) then
-         current => left
-      else
-         call Put_to_left(current%left, left)
-      end if
-   end subroutine Put_to_left
 end module List_process

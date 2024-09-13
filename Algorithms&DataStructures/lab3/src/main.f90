@@ -21,52 +21,27 @@
 ! Списки необходимо обрабатывать чистой хвостовой рекурсией при всех операциях с ними. 
 ! При возможности применяется регулярное программирование.
 
-program reference_lab_list
+program lab3
    use Environment
-   use List_Process
-   use List_IO
+   use List_process
 
    implicit none
-   character(:), allocatable :: input_file, output_file
+   character(:), allocatable :: F1, F2, F3
 
-   type(node), pointer   :: List => Null()
-   type(node2), pointer  :: List2 => Null(), Tail => Null()
-   type(sorted_node), pointer   :: List3 => Null(), Sorted_List => Null()
-   integer              :: value = 0
-   type(node_tree), pointer :: tree => Null()
+   type(node), allocatable :: List, Set
 
-   input_file  = "../data/list.txt"
-   output_file = "output.txt"
+   F1 = "../data/In.txt"
+   F2 = "../data/Delete.txt"
+   F3 = "output.txt"
+
+   ! Чтение линейного списка S
+   List = Read_list(F1, .false.)
+   call output_list(F3, List, "Исходный список:", "rewind")
+   Set = Read_list(F2, .true.)
+   call output_list(F3, Set, "множество", "append")
+
+
+
+
    
-   List => Read_list(input_file)
-   call Read_list2(input_file, List2, Tail)
-   call Read_sorted_list(input_file, List3, Sorted_list)
-   tree => Read_tree(input_file)
-   
-   if (Associated(List)) then
-      call Output_list(output_file, List, "Исходный список:", "rewind")
-
-      call Put(List, 8)
-      call Output_list(output_file, List, "Список после вставки числа:", "append")
-
-      call Get(List, value)
-      !value = Get(List) ! XXX
-      call Output_list(output_file, List, "Список после забирания первого числа:", "append")
-      
-      call Delete(List, 7)
-      call Output_list(output_file, List, "Список после забирания числа 7:", "append")
-      
-      call Get(List, value)
-      call Output_list(output_file, List, "Список после забирания первого числа:", "append")
-      
-      call Output_list2(output_file, List2, "Двунаправленный список:", "append")
-      
-      call Output_ordered_list(output_file, List3, "Неотсортированный список:", "append")
-      call Output_sorted_list(output_file, Sorted_list, "Отсортированный список:", "append")
-      
-      call Output_tree(output_file, tree, "Простой обход дерева:", "append")
-      call Delete_in_tree(tree, 3)
-      call Output_tree(output_file, tree, "Дерево после удалени корня:", "append")
-   end if
-   
-end program reference_lab_list
+end program lab3
