@@ -23,25 +23,43 @@
 
 program lab3
    use Environment
-   use List_process
-
-   implicit none
-   character(:), allocatable :: F1, F2, F3
-
-   type(node), allocatable :: List, Set
-
-   F1 = "../data/In.txt"
-   F2 = "../data/Delete.txt"
-   F3 = "output.txt"
-
-   ! Чтение линейного списка S
-   List = Read_list(F1, .false.)
-   call output_list(F3, List, "Исходный список:", "rewind")
-   Set = Read_list(F2, .true.)
-   call output_list(F3, Set, "множество", "append")
-
-
-
-
+   use List_IO
+   use List_Process
    
+   implicit none
+   
+   character(:), allocatable :: input_file, output_file, delete_file, header
+   ! Объявление списка
+   type(list)                :: string
+   ! Объявление множества
+   type(set)                 :: delete_string 
+
+   input_file = '../data/input.txt'
+   delete_file = '../data/delete.txt'
+   output_file = 'output.txt'
+
+   ! Чтение списка из файла
+   call string%read_from_file(input_file)
+   ! Чтение множества из файла
+   call delete_string%read_from_file(delete_file)
+   
+   ! Вывод списка и множества в файл
+   header = 'Строка в списке'
+   call string%output_to_file(output_file, header, 'rewind')
+   header = 'Строка в множестве'
+   call delete_string%output_to_file(output_file, header, 'append')
+
+   ! Вычитание списка из множества
+   !call subtract_list_from_set(delete_string, string)
+   ! Вычитание множества из списка
+   call subtract_set_from_list(string, delete_string)
+
+   header = 'Список после вычитания'
+   call string%output_to_file(output_file, header, 'append')
+   ! header = 'Множество после вычитания'
+   ! call delete_string%output_to_file(output_file, header, 'append')
+
+   ! Удаление списка и множества из памяти
+   call string%clear()
+   call delete_string%clear()
 end program lab3
