@@ -30,54 +30,61 @@
 
 program lab_2
    use Environment
-   use Source_Process
-   use Source_IO
+   use List_IO
+   use List_Process
 
    implicit none
-   character(*), parameter :: input_file = "../data/input.txt", &
-                              output_file = "output.txt"
-  
-   
-   type(string), allocatable :: source_line ! исходная строка
-   type(command), allocatable :: command_line 
-   logical :: end_of_file
-   integer(I_) :: In, IO
 
-   open(file=input_file, newunit=In, iostat=IO, encoding=E_)
-   ! чтение исходной строки из файла к которой будут применяться команды
-   source_line = read_string(In)
-   ! вывод исходной строки
-   call write_string(output_file, source_line, "rewind")
+   ! Инициализация файлов ввода/вывода
+   character(*), parameter   :: input_file = "../data/input.txt", &
+                                output_file = "output.txt"
 
-   ! открываем файл для чтения команд
-   
-   ! read(In, "(A)", advance="no") ! пропускаем первую строку
-   ! call Handle_IO_Status(IO, "Read first line")
+   ! Буфер для вставки текста
+   character(:), allocatable :: trimmed_insert_buf 
+   character(1024)           :: insert_buf
+   ! Хранение типа команды ('I' - вставка, 'D' - удаление)
+   character(1)              :: command
+   ! Позиция для выполнения команды, количество удалений 
+   integer(I_)               :: command_pos, delete_count
+   integer(I_)               :: In, IO = 0
+   ! Хранение списка
+   type(list)                :: string 
 
-   ! чтение и выполнение команд
-   end_of_file = .false.
+   ! Чтение исходной строки
+   call string%read_from_file(input_file)
+   ! Вывод исходной строки
+   call string%output_to_file(output_file, 'rewind')
 
-   do while (.not. end_of_file)
-      command_line = read_command(In)
-      if (command_line%cmd_type == "") then
-         end_of_file = .true.
-         exit
+   open(file=input_file, encoding=E_, newunit=In)
+   ! Пропускаем первую строку
+   read(In, *)
+   ! Цикл чтения/выполнения команд
+   do while (IO == 0)
+      ! Чтение типа команды и позиции
+      read(In, '(a1, 1x, i2, 1x)', iostat=io, advance='no') command, command_pos
+      if (command .eq. 'I') then
+         ! Считываем текст для вставки
+         read(In, '(a)', iostat=IO) insert_buf
+         ! Убираем лишние пробелы
+         trimmed_insert_buf = trim(insert_buf)
+         ! Вставка текста в строку
+         call insert_into_text(string, command_pos, trimmed_insert_buf)
+         ! Вывод команды в файл
+         call write_insert_com_to_file(output_file, command, command_pos, insert_buf, 'append')
+         ! Вывод итоговой строки в файл
+         call string%output_to_file(output_file, 'append')
+
+      else if(command .eq. 'D') then
+         ! Считываем количество символов для удаления
+         read(In, '(i2)', iostat=io) delete_count
+         ! Удаление символов из строки
+         call delete_from_text(string, command_pos, delete_count)
+         ! Вывод команды в файл
+         call write_delete_com_to_file(output_file, command, command_pos, delete_count, 'append')
+         ! Вывод итоговой строки в файл
+         call string%output_to_file(output_file, 'append')
       end if
-
-      ! вывод команды перед выполнением
-      call write_command(output_file, command_line, "append")
-
-     ! select case (cmd%cmd_type)
-     ! case ('I') ! вставка
-     !    call insert_chars(source_line, cmd%pos, cmd%insert_str)
-     !    call write_string(output_file, source_line, "append")
-
-      !case ('D') ! удаление
-      !   call delete_chars(source_line, cmd%pos, cmd%num)
-      !   call write_string(output_file, source_line, "append")
-      !end select
    end do
-
    close(In)
 
 end program lab_2
